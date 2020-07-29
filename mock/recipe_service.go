@@ -4,7 +4,7 @@ import (
 	better "github.com/mitchdennett/tests-make-your-code-inherently-better"
 )
 
-type RecipeService struct {
+type MockRecipeService struct {
 	ListRecipesFunc func(page int) ([]*better.Recipe, error)
 }
 

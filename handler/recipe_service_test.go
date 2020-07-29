@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	better "github.com/mitchdennett/tests-make-your-code-inherently-better"
+	"github.com/mitchdennett/tests-make-your-code-inherently-better/mock"
 )
 
 func TestListRecipes(t *testing.T) {
@@ -16,11 +17,11 @@ func TestListRecipes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var store MockRecipeService
+	var store mock.MockRecipeService
 	store.ListRecipesFunc = func(page int) ([]*better.Recipe, error) {
 		return []*better.Recipe{{ID: 1, Title: "Pasta"}}, nil
 	}
-	handler := Handler{RecipeStore: &store}
+	handler := Handler{RecipeService: &store}
 
 	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	rr := httptest.NewRecorder()

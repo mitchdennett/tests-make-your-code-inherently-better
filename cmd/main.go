@@ -13,11 +13,7 @@ func main() {
 	db := database.SetupDatabase()
 	store := database.DB{DB: db}
 
-	env := &handler.Env{
-		RecipeService: &store,
-	}
-
-	http.Handle("/recipes", handler.Handler{Env: env, H: handler.ListRecipes})
+	http.Handle("/recipes", handler.Handler{RecipeService: &store})
 
 	// Logs the error if ListenAndServe fails.
 	log.Fatal(http.ListenAndServe(":8000", nil))
