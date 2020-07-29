@@ -2,16 +2,17 @@ package handler
 
 import (
 	"net/http"
+
+	better "github.com/mitchdennett/tests-make-your-code-inherently-better"
 )
 
 // The Handler struct that takes a configured Env and a function matching
 // our useful signature.
 type Handler struct {
-	*Env
-	H func(e *Env, w http.ResponseWriter, r *http.Request)
+	RecipeService better.RecipeService
 }
 
 // ServeHTTP allows our Handler type to satisfy http.Handler.
 func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.H(h.Env, w, r)
+	h.handleListRecipes(w, r)
 }

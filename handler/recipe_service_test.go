@@ -8,13 +8,6 @@ import (
 	better "github.com/mitchdennett/tests-make-your-code-inherently-better"
 )
 
-type MockRecipeService struct {
-}
-
-func (s *MockRecipeService) ListRecipes(page int) ([]*better.Recipe, error) {
-	return []*better.Recipe{{ID: 1, Title: "Pasta"}}, nil
-}
-
 func TestListRecipes(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
@@ -23,14 +16,14 @@ func TestListRecipes(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	store := MockRecipeService{}
-	env := Env{
-		RecipeService: &store,
+	var store MockRecipeService
+	store.ListRecipesFunc = func(page int) ([]*better.Recipe, error) {
+		return []*better.Recipe{{ID: 1, Title: "Pasta"}}, nil
 	}
+	handler := Handler{RecipeStore: &store}
+
 	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	rr := httptest.NewRecorder()
-
-	handler := Handler{Env: &env, H: ListRecipes}
 
 	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 	// directly and pass in our Request and ResponseRecorder.
@@ -38,7 +31,6 @@ func TestListRecipes(t *testing.T) {
 
 	// Check the status code is what we expect.
 	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
 }
