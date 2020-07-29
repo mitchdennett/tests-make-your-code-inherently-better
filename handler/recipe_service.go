@@ -3,32 +3,26 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 )
 
-func ListRecipes(e *Env, w http.ResponseWriter, r *http.Request) {
-	pages, ok := r.URL.Query()["page"]
-
-	if !ok || len(pages[0]) < 1 {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	page, err := strconv.Atoi(pages[0])
-
+func (h *Handler) handleListRecipes(w http.ResponseWriter, r *http.Request) {
+	page, err := strconv.Atoi(r.URL.Query().Get("page"))
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		http.Error(w, "invalid page", http.StatusBadRequest)
 		return
 	}
 
-	itemsList, err := e.RecipeService.ListRecipes(page)
-
+	items, err := h.RecipeService.ListRecipes(page)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		log.Print("http error", err)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
-	retJSON, err := json.Marshal(itemsList)
-	fmt.Fprintf(w, string(retJSON))
+	if err := json.NewEncoder(w).Encode(items); err != nil {
+		log.Print("http json encoding error", err)
+	}
 }
